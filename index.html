@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10243a">
+<title>Мої фінанси</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172b4d}
+header{background:#10243a;color:white;padding:24px 18px;border-radius:0 0 22px 22px}
+h1{margin:0 0 8px;font-size:26px}
+header p{margin:0;color:#cbd5e1}
+main{padding:16px;max-width:600px;margin:auto}
+.card{background:white;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #10243a0d}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+input,select,button{width:100%;padding:13px;border-radius:10px;font-size:16px}
+input,select{border:1px solid #cbd5e1;background:white}
+button{border:0;background:#087f5b;color:white;font-weight:bold;margin-top:14px}
+.total{font-size:30px;font-weight:bold;color:#087f5b;margin-top:8px}
+.muted{color:#64748b;font-size:14px}
+.entry{padding:12px 0;border-bottom:1px solid #e2e8f0}
+.entry:last-child{border:0}
+.delete{background:#fee2e2;color:#991b1b;width:auto;padding:7px 12px;margin:8px 0 0}
+</style>
+</head>
+<body>
+<header>
+<h1>💰 Мої фінанси</h1>
+<p>Особистий фінансовий помічник</p>
+</header>
+<main>
+<div class="card">
+<div class="muted">Мій баланс</div>
+<div class="total" id="balance">0,00 ₴</div>
+<p class="muted">Усі записані доходи мінус витрати</p>
+</div>
+<div class="card">
+<h2>＋ Нова операція</h2>
+<label for="kind">Тип операції</label>
+<select id="kind">
+<option value="income">Дохід</option>
+<option value="expense">Витрата</option>
+</select>
+<label for="amount">Сума (грн)</label>
+<input id="amount" type="number" min="0.01" step="0.01" placeholder="Наприклад, 1500">
+<label for="note">Опис</label>
+<input id="note" maxlength="100" placeholder="Наприклад, зарплата">
+<button id="add">Зберегти операцію</button>
+<p class="muted">Записи зберігаються на цьому пристрої в браузері.</p>
+</div>
+<div class="card">
+<h2>📊 Історія операцій</h2>
+<div id="history"></div>
+<button id="clear" style="background:#64748b">Видалити всі записи</button>
+</div>
+</main>
+<script>
+const key="moji-finansy-v1";
+let records=[];
+try{records=JSON.parse(localStorage.getItem(key)||"[]");if(!Array.isArray(records))records=[]}catch(e){records=[]}
+const money=n=>n.toLocaleString("uk-UA",{minimumFractionDigits:2,maximumFractionDigits:2})+" ₴";
+function render(){
+const balance=records.reduce((s,r)=>s+(r.kind==="income"?r.amount:-r.amount),0);
+document.getElementById("balance").textContent=money(balance);
+const history=document.getElementById("history");
+history.replaceChildren();
+if(!records.length){history.textContent="Поки записів немає.";return}
+[...records].reverse().forEach(r=>{
+const item=document.createElement("div");item.className="entry";
+const title=document.createElement("strong");
+title.textContent=(r.kind==="income"?"+ ":"− ")+money(r.amount);
+title.style.color=r.kind==="income"?"#087f5b":"#b91c1c";
+const desc=document.createElement("div");desc.textContent=r.note|| (r.kind==="income"?"Дохід":"Витрата");
+const date=document.createElement("div");date.className="muted";date.textContent=r.date;
+const del=document.createElement("button");del.className="delete";del.textContent="Видалити";
+del.addEventListener("click",()=>{records=records.filter(x=>x.id!==r.id);save()});
+item.append(title,desc,date,del);history.append(item);
+});
+}
+function save(){try{localStorage.setItem(key,JSON.stringify(records));render()}catch(e){alert("Не вдалося зберегти дані в браузері.")}}
+document.getElementById("add").addEventListener("click",()=>{
+const amount=Number(document.getElementById("amount").value);
+if(!Number.isFinite(amount)||amount<=0){alert("Введи суму більшу за нуль.");return}
+records.push({id:Date.now()+Math.random(),kind:document.getElementById("kind").value,amount,note:document.getElementById("note").value.trim(),date:new Date().toLocaleDateString("uk-UA")});
+save();document.getElementById("amount").value="";document.getElementById("note").value="";
+});
+document.getElementById("clear").addEventListener("click",()=>{
+if(confirm("Точно видалити всі операції?")){records=[];save()}
+});
+render();
+</script>
+</body>
+</html>
