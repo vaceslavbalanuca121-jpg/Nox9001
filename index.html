@@ -2,94 +2,282 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <link rel="manifest" href="manifest.json">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#10243a">
+<meta name="theme-color" content="#0b1428">
+<link rel="manifest" href="manifest.json">
 <title>Мої фінанси</title>
 <style>
+:root{--bg:#0b1428;--card:#14213b;--card2:#1b2c49;--blue:#5587ff;--green:#43d6a0;--red:#ff7585;--muted:#9bacc7;--line:#293b59}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172b4d}
-header{background:#10243a;color:white;padding:24px 18px;border-radius:0 0 22px 22px}
-h1{margin:0 0 8px;font-size:26px}
-header p{margin:0;color:#cbd5e1}
-main{padding:16px;max-width:600px;margin:auto}
-.card{background:white;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #10243a0d}
-label{display:block;font-weight:bold;margin:12px 0 6px}
-input,select,button{width:100%;padding:13px;border-radius:10px;font-size:16px}
-input,select{border:1px solid #cbd5e1;background:white}
-button{border:0;background:#087f5b;color:white;font-weight:bold;margin-top:14px}
-.total{font-size:30px;font-weight:bold;color:#087f5b;margin-top:8px}
-.muted{color:#64748b;font-size:14px}
-.entry{padding:12px 0;border-bottom:1px solid #e2e8f0}
-.entry:last-child{border:0}
-.delete{background:#fee2e2;color:#991b1b;width:auto;padding:7px 12px;margin:8px 0 0}
+body{margin:0;background:var(--bg);color:#f2f6ff;font:15px Arial,sans-serif}
+header{padding:24px 18px 18px;background:linear-gradient(140deg,#182d51,#0b1428)}
+header p{color:var(--muted);margin:6px 0 0}
+h1{font-size:25px;margin:0}
+h2{font-size:18px;margin:0 0 15px}
+h3{font-size:15px;margin:0 0 10px}
+main{max-width:650px;margin:auto;padding:14px 14px 100px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin-bottom:14px}
+.muted{color:var(--muted);font-size:13px}
+.balance{font-size:32px;font-weight:bold;margin:9px 0 14px;overflow-wrap:anywhere}
+.row{display:flex;gap:10px}
+.row>*{flex:1;min-width:0}
+.stat{background:var(--card2);padding:12px;border-radius:13px}
+.stat strong{display:block;margin-top:7px;font-size:17px;overflow-wrap:anywhere}
+.green{color:var(--green)}.red{color:var(--red)}.blue{color:#85aaff}
+label{display:block;margin:13px 0 6px;color:#c9d5eb;font-size:13px}
+input,select,button{font:inherit;border-radius:11px;padding:12px;width:100%}
+input,select{background:#0d1930;color:white;border:1px solid #344968}
+button{background:var(--blue);color:white;border:0;font-weight:bold;cursor:pointer}
+button:active{opacity:.8}
+.secondary{background:var(--card2)}
+nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:9px 7px calc(9px + env(safe-area-inset-bottom));background:#101d33;border-top:1px solid var(--line);z-index:5}
+nav button{background:transparent;color:var(--muted);font-size:11px;padding:9px 2px}
+nav button.active{background:#233c67;color:white}
+nav span{display:block;font-size:19px;margin-bottom:4px}
+.page{display:none}.page.active{display:block}
+.entry{padding:12px 0;border-bottom:1px solid var(--line)}
+.entry:last-child{border-bottom:0}
+.entrytop{display:flex;justify-content:space-between;gap:10px}
+.entrytop strong{overflow-wrap:anywhere}
+.smallbtn{width:auto;padding:7px 10px;font-size:12px;background:#3b2940;margin-top:8px}
+.barline{display:flex;align-items:center;gap:9px;margin:12px 0}
+.barname{width:100px;font-size:12px;overflow-wrap:anywhere}
+.bartrack{flex:1;background:#263652;border-radius:8px;height:12px;overflow:hidden}
+.bar{height:100%;background:var(--blue);border-radius:8px}
+.barvalue{font-size:12px;min-width:70px;text-align:right}
+.progress{height:12px;background:#293b59;border-radius:10px;overflow:hidden;margin:12px 0}
+.progress div{height:100%;background:var(--green);width:0}
+.note{line-height:1.5}
 </style>
 </head>
 <body>
 <header>
 <h1>💰 Мої фінанси</h1>
-<p>Особистий фінансовий помічник</p>
+<p>Твій особистий фінансовий помічник</p>
 </header>
 <main>
+<section id="home" class="page active">
 <div class="card">
-<div class="muted">Мій баланс</div>
-<div class="total" id="balance">0,00 ₴</div>
-<p class="muted">Усі записані доходи мінус витрати</p>
+<div class="muted">Загальний баланс</div>
+<div class="balance" id="balance">0,00 ₴</div>
+<div class="row">
+<div class="stat"><div class="muted">Доходи цього місяця</div><strong class="green" id="income">0 ₴</strong></div>
+<div class="stat"><div class="muted">Витрати цього місяця</div><strong class="red" id="expense">0 ₴</strong></div>
+</div>
 </div>
 <div class="card">
 <h2>＋ Нова операція</h2>
-<label for="kind">Тип операції</label>
-<select id="kind">
-<option value="income">Дохід</option>
-<option value="expense">Витрата</option>
-</select>
-<label for="amount">Сума (грн)</label>
+<label for="kind">Тип</label>
+<select id="kind"><option value="income">Дохід</option><option value="expense">Витрата</option></select>
+<label for="amount">Сума, грн</label>
 <input id="amount" type="number" min="0.01" step="0.01" placeholder="Наприклад, 1500">
+<label for="category">Категорія</label>
+<select id="category">
+<option>Інше</option><option>Зарплата</option><option>Продукти</option><option>Житло та комунальні</option><option>Транспорт</option><option>Здоров'я</option><option>Покупки</option><option>Розваги</option><option>Подарунки</option><option>Інвестиції</option>
+</select>
 <label for="note">Опис</label>
-<input id="note" maxlength="100" placeholder="Наприклад, зарплата">
+<input id="note" maxlength="100" placeholder="Наприклад, продукти">
 <button id="add">Зберегти операцію</button>
-<p class="muted">Записи зберігаються на цьому пристрої в браузері.</p>
 </div>
 <div class="card">
-<h2>📊 Історія операцій</h2>
+<h2>Останні операції</h2>
 <div id="history"></div>
-<button id="clear" style="background:#64748b">Видалити всі записи</button>
 </div>
+</section>
+
+<section id="analytics" class="page">
+<div class="card">
+<h2>📊 Аналітика за місяць</h2>
+<div class="muted" id="monthLabel"></div>
+<div class="row" style="margin-top:14px">
+<div class="stat"><div class="muted">Доходи</div><strong class="green" id="aIncome">0 ₴</strong></div>
+<div class="stat"><div class="muted">Витрати</div><strong class="red" id="aExpense">0 ₴</strong></div>
+</div>
+<div class="stat" style="margin-top:10px"><div class="muted">Різниця за місяць</div><strong id="difference">0 ₴</strong></div>
+</div>
+<div class="card">
+<h2>Витрати за категоріями</h2>
+<div id="categoryChart" class="note muted">Додай витрати, щоб побачити аналітику.</div>
+</div>
+<div class="card">
+<h2>Доходи та витрати</h2>
+<p class="muted note">Ці показники рахуються за датами твоїх операцій. Старі записи теж враховуються.</p>
+<div id="monthBars"></div>
+</div>
+</section>
+
+<section id="budget" class="page">
+<div class="card">
+<h2>🎯 Бюджет на місяць</h2>
+<p class="muted note">Встанови максимальну суму витрат на поточний місяць.</p>
+<label for="budgetAmount">Мій бюджет, грн</label>
+<input id="budgetAmount" type="number" min="0" step="1" placeholder="Наприклад, 15000">
+<button id="saveBudget">Зберегти бюджет</button>
+<div class="progress"><div id="budgetProgress"></div></div>
+<div class="row">
+<div class="stat"><div class="muted">Вже витрачено</div><strong id="spent">0 ₴</strong></div>
+<div class="stat"><div class="muted">Залишилося</div><strong id="remaining">—</strong></div>
+</div>
+<p id="budgetMessage" class="muted note"></p>
+</div>
+</section>
+
+<section id="investments" class="page">
+<div class="card">
+<h2>📈 Мої інвестиції</h2>
+<p class="muted note">Це окремий облік вкладених коштів. Він не змінює баланс доходів і витрат.</p>
+<div class="stat"><div class="muted">Усього внесено</div><strong id="investTotal">0 ₴</strong></div>
+<label for="investType">Тип інвестиції</label>
+<select id="investType"><option>ОВДП — гривневі</option><option>ОВДП — доларові</option><option>Inzhur REIT</option><option>Інше</option></select>
+<label for="investAmount">Сума внеску в гривнях</label>
+<input id="investAmount" type="number" min="0.01" step="0.01" placeholder="Сума в гривневому еквіваленті">
+<label for="investNote">Примітка</label>
+<input id="investNote" maxlength="100" placeholder="Наприклад, дата погашення">
+<button id="addInvestment">Додати інвестицію</button>
+</div>
+<div class="card">
+<h2>Мій інвестиційний портфель</h2>
+<div id="investHistory"></div>
+</div>
+</section>
 </main>
+
+<nav>
+<button class="active" data-page="home"><span>⌂</span>Головна</button>
+<button data-page="analytics"><span>▥</span>Аналітика</button>
+<button data-page="budget"><span>◎</span>Бюджет</button>
+<button data-page="investments"><span>▤</span>Інвестиції</button>
+</nav>
+
 <script>
 const key="moji-finansy-v1";
-let records=[];
-try{records=JSON.parse(localStorage.getItem(key)||"[]");if(!Array.isArray(records))records=[]}catch(e){records=[]}
-const money=n=>n.toLocaleString("uk-UA",{minimumFractionDigits:2,maximumFractionDigits:2})+" ₴";
-function render(){
-const balance=records.reduce((s,r)=>s+(r.kind==="income"?r.amount:-r.amount),0);
-document.getElementById("balance").textContent=money(balance);
-const history=document.getElementById("history");
-history.replaceChildren();
-if(!records.length){history.textContent="Поки записів немає.";return}
-[...records].reverse().forEach(r=>{
-const item=document.createElement("div");item.className="entry";
-const title=document.createElement("strong");
-title.textContent=(r.kind==="income"?"+ ":"− ")+money(r.amount);
-title.style.color=r.kind==="income"?"#087f5b":"#b91c1c";
-const desc=document.createElement("div");desc.textContent=r.note|| (r.kind==="income"?"Дохід":"Витрата");
-const date=document.createElement("div");date.className="muted";date.textContent=r.date;
-const del=document.createElement("button");del.className="delete";del.textContent="Видалити";
-del.addEventListener("click",()=>{records=records.filter(x=>x.id!==r.id);save()});
-item.append(title,desc,date,del);history.append(item);
-});
+const budgetKey="moji-finansy-budget-v1";
+const investKey="moji-finansy-invest-v1";
+const $=id=>document.getElementById(id);
+const money=n=>Number(n||0).toLocaleString("uk-UA",{minimumFractionDigits:2,maximumFractionDigits:2})+" ₴";
+let records=[],investments=[];
+try{const x=JSON.parse(localStorage.getItem(key)||"[]");if(Array.isArray(x))records=x}catch(e){}
+try{const x=JSON.parse(localStorage.getItem(investKey)||"[]");if(Array.isArray(x))investments=x}catch(e){}
+function saveRecords(){localStorage.setItem(key,JSON.stringify(records));render()}
+function saveInvestments(){localStorage.setItem(investKey,JSON.stringify(investments));renderInvestments()}
+function parseDate(s){
+ if(!s)return null;
+ if(/^\d{4}-\d{2}-\d{2}/.test(s)){const d=new Date(s);return isNaN(d)?null:d}
+ const m=String(s).match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+ if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+ const d=new Date(s);return isNaN(d)?null:d;
 }
-function save(){try{localStorage.setItem(key,JSON.stringify(records));render()}catch(e){alert("Не вдалося зберегти дані в браузері.")}}
-document.getElementById("add").addEventListener("click",()=>{
-const amount=Number(document.getElementById("amount").value);
-if(!Number.isFinite(amount)||amount<=0){alert("Введи суму більшу за нуль.");return}
-records.push({id:Date.now()+Math.random(),kind:document.getElementById("kind").value,amount,note:document.getElementById("note").value.trim(),date:new Date().toLocaleDateString("uk-UA")});
-save();document.getElementById("amount").value="";document.getElementById("note").value="";
+function currentMonth(r){
+ const d=parseDate(r.date);const now=new Date();
+ return d&&d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+}
+function sum(list,kind){return list.reduce((s,r)=>s+((!kind||r.kind===kind)?Number(r.amount)||0:0),0)}
+function render(){
+ const inc=sum(records,"income"),exp=sum(records,"expense");
+ $("balance").textContent=money(inc-exp);
+ $("income").textContent=money(sum(records.filter(currentMonth),"income"));
+ $("expense").textContent=money(sum(records.filter(currentMonth),"expense"));
+ $("monthLabel").textContent=new Date().toLocaleDateString("uk-UA",{month:"long",year:"numeric"});
+ $("aIncome").textContent=money(sum(records.filter(currentMonth),"income"));
+ $("aExpense").textContent=money(sum(records.filter(currentMonth),"expense"));
+ $("difference").textContent=money(sum(records.filter(currentMonth),"income")-sum(records.filter(currentMonth),"expense"));
+ const history=$("history");history.replaceChildren();
+ if(!records.length)history.textContent="Поки записів немає.";
+ [...records].reverse().slice(0,12).forEach(r=>{
+  const item=document.createElement("div");item.className="entry";
+  const top=document.createElement("div");top.className="entrytop";
+  const title=document.createElement("strong");title.textContent=(r.kind==="income"?"+ ":"− ")+money(r.amount);title.className=r.kind==="income"?"green":"red";
+  const del=document.createElement("button");del.className="smallbtn";del.textContent="Видалити";
+  del.addEventListener("click",()=>{if(confirm("Видалити цю операцію?")){records=records.filter(x=>x.id!==r.id);saveRecords()}});
+  top.append(title,del);
+  const desc=document.createElement("div");desc.textContent=r.note|| (r.kind==="income"?"Дохід":"Витрата");
+  const meta=document.createElement("div");meta.className="muted";meta.textContent=(r.category||"Без категорії")+" · "+(r.date||"");
+  item.append(top,desc,meta);history.append(item);
+ });
+ renderAnalytics();renderBudget();renderInvestments();
+}
+function renderAnalytics(){
+ const expenses=records.filter(r=>r.kind==="expense"&&currentMonth(r));
+ const groups={};expenses.forEach(r=>{const c=r.category||"Без категорії";groups[c]=(groups[c]||0)+Number(r.amount||0)});
+ const box=$("categoryChart");box.replaceChildren();
+ const entries=Object.entries(groups).sort((a,b)=>b[1]-a[1]);
+ if(!entries.length){box.textContent="Додай витрати цього місяця, щоб побачити категорії.";return}
+ const max=entries[0][1]||1;
+ entries.forEach(([name,value])=>{
+  const line=document.createElement("div");line.className="barline";
+  const label=document.createElement("div");label.className="barname";label.textContent=name;
+  const track=document.createElement("div");track.className="bartrack";
+  const bar=document.createElement("div");bar.className="bar";bar.style.width=(value/max*100)+"%";track.append(bar);
+  const amount=document.createElement("div");amount.className="barvalue";amount.textContent=money(value);
+  line.append(label,track,amount);box.append(line);
+ });
+ const bars=$("monthBars");bars.replaceChildren();
+ [["Доходи",sum(records.filter(currentMonth),"income"),"var(--green)"],["Витрати",sum(records.filter(currentMonth),"expense"),"var(--red)"]].forEach(([label,val,color])=>{
+  const line=document.createElement("div");line.className="barline";
+  const name=document.createElement("div");name.className="barname";name.textContent=label;
+  const track=document.createElement("div");track.className="bartrack";
+  const bar=document.createElement("div");bar.className="bar";bar.style.background=color;
+  const max=Math.max(sum(records.filter(currentMonth),"income"),sum(records.filter(currentMonth),"expense"),1);
+  bar.style.width=(val/max*100)+"%";track.append(bar);
+  const amount=document.createElement("div");amount.className="barvalue";amount.textContent=money(val);
+  line.append(name,track,amount);bars.append(line);
+ });
+}
+function renderBudget(){
+ let budget=0;try{budget=Number(localStorage.getItem(budgetKey)||0)}catch(e){}
+ if(document.activeElement!==$("budgetAmount"))$("budgetAmount").value=budget||"";
+ const spent=sum(records.filter(currentMonth),"expense");
+ $("spent").textContent=money(spent);
+ const left=budget-spent;
+ $("remaining").textContent=budget?money(left):"—";
+ $("remaining").className=left<0?"red":"green";
+ $("budgetProgress").style.width=budget?Math.min(100,spent/budget*100)+"%":"0%";
+ $("budgetMessage").textContent=!budget?"Введи суму бюджету та збережи її.":left<0?"Увага: ти перевищив бюджет на "+money(-left)+".":"Використано "+Math.round(spent/budget*100)+"% бюджету.";
+}
+function renderInvestments(){
+ $("investTotal").textContent=money(sum(investments));
+ const box=$("investHistory");box.replaceChildren();
+ if(!investments.length){box.textContent="Поки інвестицій не додано.";return}
+ const groups={};investments.forEach(r=>groups[r.type]=(groups[r.type]||0)+Number(r.amount||0));
+ Object.entries(groups).forEach(([type,value])=>{
+  const item=document.createElement("div");item.className="entry";
+  const top=document.createElement("div");top.className="entrytop";
+  const title=document.createElement("strong");title.textContent=type;
+  const amount=document.createElement("strong");amount.className="blue";amount.textContent=money(value);
+  top.append(title,amount);item.append(top);box.append(item);
+ });
+ [...investments].reverse().forEach(r=>{
+  const item=document.createElement("div");item.className="entry";
+  const text=document.createElement("div");text.textContent=(r.note||r.type)+" · "+money(r.amount);
+  const meta=document.createElement("div");meta.className="muted";meta.textContent=r.date||"";
+  const del=document.createElement("button");del.className="smallbtn";del.textContent="Видалити внесок";
+  del.addEventListener("click",()=>{if(confirm("Видалити цей внесок з обліку?")){investments=investments.filter(x=>x.id!==r.id);saveInvestments()}});
+  item.append(text,meta,del);box.append(item);
+ });
+}
+$("add").addEventListener("click",()=>{
+ const amount=Number($("amount").value);
+ if(!Number.isFinite(amount)||amount<=0){alert("Введи суму більшу за нуль.");return}
+ records.push({id:Date.now()+Math.random(),kind:$("kind").value,amount,note:$("note").value.trim(),category:$("category").value,date:new Date().toLocaleDateString("uk-UA")});
+ saveRecords();$("amount").value="";$("note").value="";
 });
-document.getElementById("clear").addEventListener("click",()=>{
-if(confirm("Точно видалити всі операції?")){records=[];save()}
+$("saveBudget").addEventListener("click",()=>{
+ const n=Number($("budgetAmount").value);
+ if(!Number.isFinite(n)||n<=0){alert("Введи бюджет більший за нуль.");return}
+ localStorage.setItem(budgetKey,String(n));renderBudget();alert("Бюджет збережено!");
 });
+$("addInvestment").addEventListener("click",()=>{
+ const amount=Number($("investAmount").value);
+ if(!Number.isFinite(amount)||amount<=0){alert("Введи суму більшу за нуль.");return}
+ investments.push({id:Date.now()+Math.random(),type:$("investType").value,amount,note:$("investNote").value.trim(),date:new Date().toLocaleDateString("uk-UA")});
+ saveInvestments();$("investAmount").value="";$("investNote").value="";
+});
+document.querySelectorAll("nav button").forEach(btn=>btn.addEventListener("click",()=>{
+ document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b===btn));
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===btn.dataset.page));
+ window.scrollTo(0,0);
+}));
 render();
 </script>
 </body>
