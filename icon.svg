@@ -1,5 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="110" fill="#1769ff"/>
-  <path d="M145 145h222M145 205h222M256 145v220M145 265h222" stroke="#fff" stroke-width="28" stroke-linecap="round"/>
-  <path d="M115 365l75-65 65 30 115-115" fill="none" stroke="#7dffcf" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#172b4d"/>
+      <stop offset="0.55" stop-color="#0b1428"/>
+      <stop offset="1" stop-color="#07101f"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#fff0b3"/>
+      <stop offset="0.42" stop-color="#e9bf61"/>
+      <stop offset="1" stop-color="#b98028"/>
+    </linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.52" stop-color="#d9e5f4"/>
+      <stop offset="1" stop-color="#8fa8c8"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="18" y="18" width="476" height="476" rx="98" fill="none" stroke="#9cb4d8" stroke-opacity=".16" stroke-width="2"/>
+  <circle cx="256" cy="244" r="152" fill="#4b73b6" opacity=".10" filter="url(#shadow)"/>
+  <path d="M120 365 C165 409 344 421 392 351" fill="none" stroke="#8ca6ce" stroke-opacity=".16" stroke-width="3" stroke-linecap="round"/>
+  <text x="170" y="337" font-family="DejaVu Sans, Noto Sans, Arial, sans-serif" font-size="226" font-weight="700" fill="url(#silver)" text-anchor="middle">$</text>
+  <text x="315" y="304" font-family="DejaVu Sans, Noto Sans, Arial, sans-serif" font-size="198" font-weight="700" fill="url(#gold)" text-anchor="middle">₴</text>
+  <path d="M177 153 C210 119 259 108 306 119" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="4" stroke-linecap="round"/>
 </svg>
